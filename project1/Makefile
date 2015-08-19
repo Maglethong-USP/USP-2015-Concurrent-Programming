@@ -21,7 +21,7 @@ SRC			=	./src
 #########
 
 # Main Source File
-SOURCES		=	$(SRC)/*.cc
+SOURCES		=	$(SRC)/*.c
 
 # Zip File Name
 ZIP			=	project1
@@ -40,7 +40,7 @@ FLAGS 		=	-lm -pthread
 all:
 	@rm -r -v $(BIN)
 	@mkdir -v $(BIN)
-	g++ -I$(LIB) -o $(BIN)/prog $(SOURCES) $(FLAGS)
+	gcc -I$(LIB) -o $(BIN)/prog $(SOURCES) $(FLAGS)
 
 run:
 	$(BIN)/prog
