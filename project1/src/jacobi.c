@@ -1,4 +1,6 @@
 #include "jacobi.h"
+#include <stdlib.h>
+
 
 
 int 	Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
@@ -24,7 +26,7 @@ int 	Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
 }
 
 
-j_type	Jacobi_SingleIteraction(j_type **A, j_type *b, j_type *x, int size, int i)
+j_type	Jacobi_SingleIteraction(j_type **A, j_type *b, j_type *x, int i, int size)
 {
 	j_type res = 0;
 	int j;
@@ -33,6 +35,8 @@ j_type	Jacobi_SingleIteraction(j_type **A, j_type *b, j_type *x, int size, int i
 		res += A[i][j] *x[j];
 
 	res = b[i] - res;
+
+	return res;
 }
 
 
