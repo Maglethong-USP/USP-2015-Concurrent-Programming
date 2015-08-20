@@ -7,6 +7,7 @@
 int 	Jacobi_Init(Jacobi *jacobi)
 {
 	int i;
+	int linesPerThread;
 
 	// Set all to NULL
 	jacobi->iterations 	= 0;
@@ -26,6 +27,7 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	jacobi->threadSize = THREADS;
 	// Size
 	jacobi->size = 3;
+
 	// A
 	if( (jacobi->A = (j_type **) malloc(sizeof(j_type *) *jacobi->size) ) == NULL )
 		return 1;
@@ -76,14 +78,36 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	jacobi->x2[2] = 0;
 
 	// info
+	linesPerThread = ceil( (float)jacobi->size / (float)jacobi->threadSize);
 	for(i=0; i< jacobi->threadSize; i++)
 	{
 		jacobi->info[i].jacobi = jacobi;
-		jacobi->info[i].line = 0;
+		jacobi->info[i].lineStart = i *linesPerThread;
+		jacobi->info[i].lineEnd = (i +1) *linesPerThread -1;
 	}
+	jacobi->info[jacobi->threadSize -1].lineEnd = jacobi->size -1;
 
 	// Success
 	return 0; 
+}
+
+void 	Jacobi_Verify(Jacobi *jacobi)
+{
+	int i, j;
+	int diverge = 0;
+	int sum;
+
+	for(i=0; i<jacobi.size; i++)
+	{
+		sum =0;
+		for(j=0; j<jacobi.size; j++)
+			sum += jacobi->A[i][j];
+		sum -= A[i][i] *2;
+		if(sum > 0)
+			diverge = 1;
+	}
+
+	return diverge;
 }
 
 void 	Jacobi_Destroy(Jacobi *jacobi)
@@ -101,6 +125,18 @@ void 	Jacobi_Destroy(Jacobi *jacobi)
 			free(jacobi->A[i]);
 		free(jacobi->A);
 	}
+}
+
+void 	Jacobi_DebugThreads(Jacobi *jacobi)
+{
+	int i;
+
+	printf("Threads: (%d) [%d lines]\n", jacobi->threadSize, jacobi->size);
+	for(i=0; i<jacobi->threadSize; i++)
+	{
+		printf(" %2.d - [%d, %d] \n", i, jacobi->info[i].lineStart, jacobi->info[i].lineEnd);
+	}
+	printf("\n");
 }
 
 void 	Jacobi_Debug(Jacobi *jacobi)
@@ -144,21 +180,18 @@ void 	Jacobi_InitUnknowns(Jacobi *jacobi)
 
 int 	Jacobi_Preprocess(Jacobi *jacobi)
 {
-	//! TODO [temporary only sequential]
 	int i;
-	struct _Jacobi_ThreadInfo info;
+	int error = 0;
 
-	// Init thread info
-	info.jacobi = jacobi;
+	// Create threads
+	for(i=0; i< jacobi->threadSize && !error; i++)
+		error = pthread_create(jacobi->thread +i, NULL, (void * (*)(void *)) _Jacobi_ThreadPreprocess, (void *)(jacobi->info +i));
 
-	// Start preprocessing each line
-	for(i=0; i< jacobi->size; i++)
-	{
-		info.line = i;
-		_Jacobi_SinglePreprocess2(&info);
-	}
+	// Join threads to synchronize
+	for(i=0; i< jacobi->threadSize && !error; i++)
+		error = pthread_join(jacobi->thread[i], NULL);
 
-	return 0;
+	return error;
 }
 
 int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
@@ -166,22 +199,22 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 	//! TODO [temporary only sequential]
 	int i, j;
 	j_type precision;
-	struct _Jacobi_ThreadInfo info;
 	j_type *tmp;
-
-	// Init thread info
-	info.jacobi = jacobi;
+	int error = 0;
 
 	// Run iterations
 	for(j=0; j< MAX_ITER; j++)
 	{
-		// Iteration
 		jacobi->iterations++;
-		for(i=0; i< jacobi->size; i++)
-		{
-			info.line = i;
-			_Jacobi_SingleIteraction2(&info);
-		}
+
+		// Create threads
+		for(i=0; i< jacobi->threadSize && !error; i++)
+			error = pthread_create(jacobi->thread +i, NULL, (void * (*)(void *)) _Jacobi_ThreadIteraction, (void *)(jacobi->info +i));
+		
+		// Join threads to synchronize
+		for(i=0; i< jacobi->threadSize && !error; i++)
+			error = pthread_join(jacobi->thread[i], NULL);
+
 		// Precision calc
 		precision = _Jacobi_CheckPrecision(jacobi->x1, jacobi->x2, jacobi->size);
 
@@ -194,19 +227,22 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 		Jacobi_DebugUnknowns(jacobi);
 
 		// Precision reach check
-		if(precision < desiredPrecision)
+		if(precision < desiredPrecision || error)
 			break;
 	}
 
-	return 0;
+	return error;
 }
 
-int 	_Jacobi_SinglePreprocess2(struct _Jacobi_ThreadInfo *info)
+void 	_Jacobi_ThreadPreprocess(struct _Jacobi_ThreadInfo *info)
 {
-	return _Jacobi_SinglePreprocess(info->jacobi->A, info->jacobi->b, info->line, info->jacobi->size);
+	int i;
+
+	for(i = info->lineStart; i <= info->lineEnd; i++)
+		_Jacobi_SinglePreprocess(info->jacobi->A, info->jacobi->b, i, info->jacobi->size);
 }
 
-int 	_Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
+void 	_Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
 {
 	j_type diagonal = A[i][i];
 	int j;
@@ -214,23 +250,18 @@ int 	_Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
 	// Setting diagonal value to 0
 	A[i][i] = 0;
 
-	// Check if needed
-	if(diagonal == 0)
-		return 1;
-	if(diagonal == 1)
-		return 0;
-
 	// Setting diagonal to 1
 	for(j=0; j<size; j++)
 		A[i][j] /= diagonal;
 	b[i] /= diagonal;
-
-	return 0;
 }
 
-void 	_Jacobi_SingleIteraction2(struct _Jacobi_ThreadInfo *info)
+void 	_Jacobi_ThreadIteraction(struct _Jacobi_ThreadInfo *info)
 {
-	info->jacobi->x2[info->line] = _Jacobi_SingleIteraction(info->jacobi->A, info->jacobi->b, info->jacobi->x1, info->line, info->jacobi->size);
+	int i;
+
+	for(i = info->lineStart; i <= info->lineEnd; i++)
+		info->jacobi->x2[i] = _Jacobi_SingleIteraction(info->jacobi->A, info->jacobi->b, info->jacobi->x1, i, info->jacobi->size);
 }
 
 j_type	_Jacobi_SingleIteraction(j_type **A, j_type *b, j_type *x, int i, int size)

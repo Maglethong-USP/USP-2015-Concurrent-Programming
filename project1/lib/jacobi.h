@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>		// for ceil()
 
 //! Defining type to be used on method
 typedef double j_type;
@@ -41,23 +42,26 @@ typedef struct _Jacobi
 struct _Jacobi_ThreadInfo
 {
 	struct _Jacobi *jacobi;
-	int line;
+	int lineStart;
+	int lineEnd;
 };
 
 
 
+void 	Jacobi_Verify(Jacobi *jacobi);
 int 	Jacobi_Init(Jacobi *jacobi);
 void 	Jacobi_Destroy(Jacobi *jacobi);
+void 	Jacobi_DebugThreads(Jacobi *jacobi);
 void 	Jacobi_Debug(Jacobi *jacobi);
 void 	Jacobi_DebugMatrix(Jacobi *jacobi);
 void 	Jacobi_DebugUnknowns(Jacobi *jacobi);
 void 	Jacobi_InitUnknowns(Jacobi *jacobi);
 int 	Jacobi_Preprocess(Jacobi *jacobi);
 int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision);
-int 	_Jacobi_SinglePreprocess2(struct _Jacobi_ThreadInfo *info);
-void 	_Jacobi_SingleIteraction2(struct _Jacobi_ThreadInfo *info);
+void 	_Jacobi_ThreadPreprocess(struct _Jacobi_ThreadInfo *info);
+void 	_Jacobi_ThreadIteraction(struct _Jacobi_ThreadInfo *info);
 
-//! Calculates one iteration of one single unknown
+//! [Internal] Calculates one iteration of one single unknown
 /*!
 	/param coefficients		The matrix [A] containing the coefficients of the system.
 								This matrix must have been pre-processed using Jacobi_SinglePreprocess().
@@ -72,7 +76,7 @@ void 	_Jacobi_SingleIteraction2(struct _Jacobi_ThreadInfo *info);
 j_type _Jacobi_SingleIteraction(j_type **coefficients, j_type *constants, j_type *unknowns, int line, int size);
 
 
-//! Reprocess input matrices for other functions. Only one single line is preprocessed.
+//! [Internal] Reprocess input matrices for other functions. Only one single line is preprocessed.
 /*!
 	Changes the matrix so that the diagonal values are 1.
 	To further optimize the functions the diagonal values are set to 0 afterwards
@@ -84,14 +88,11 @@ j_type _Jacobi_SingleIteraction(j_type **coefficients, j_type *constants, j_type
 	/param constants		The matrix [b] with the constant terms of the system.
 	/param line				The line currently being preprocessed
 	/param size				The size of the system (number of equations)
-	/return					Error value: 
-							 * 0 -> no error
-							 * 1 -> Diagonal value is 0 (zero div error)
 */
-int 	_Jacobi_SinglePreprocess(j_type **coefficients, j_type *constants, int line, int size);
+void 	_Jacobi_SinglePreprocess(j_type **coefficients, j_type *constants, int line, int size);
 
 
-//! Checks the precision of the last iteration
+//! [Internal] Checks the precision of the last iteration
 /*!
 	/param unknowns1 		The matrix [x] with the values of the unknown terms of the system of the previous.
 	/param unknowns2 		The matrix [x] with the values of the unknown terms of the system of the last iteration.

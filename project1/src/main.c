@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
 	}
 
 	// Debug
-	Jacobi_Debug(&jacobi);
+	Jacobi_DebugMatrix(&jacobi);
+	Jacobi_DebugThreads(&jacobi);
 
 	// Preprocess
 	if( error = Jacobi_Preprocess(&jacobi) )
@@ -38,7 +39,13 @@ int main(int argc, char *argv[])
 	Jacobi_Debug(&jacobi);
 
 	// Jacobi Iterations
-	Jacobi_Run(&jacobi, PRECISION);
+	if( error = Jacobi_Run(&jacobi, PRECISION) )
+	{
+		printf("Error #%dp!", error);
+		Jacobi_Destroy(&jacobi);
+		return 0;
+	}
+
 
 	// End
 	Jacobi_Destroy(&jacobi);
