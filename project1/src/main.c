@@ -130,10 +130,10 @@ int main(int argc, char *argv[])
 	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Iterations: %d \n", jacobi->iterations);
-	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, jacobi->x1[J_ROW_TEST], jacobi->b[J_ROW_TEST]);
+	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, jacobi->x1[J_ROW_TEST], jacobi->b[J_ROW_TEST]); //! TODO [fix this]
 	printf("-------------------------------------------------------------------------------\n");
 
-	// If user wants fie with individual output
+	// If user wants file with more output
 	if(fpOut)
 	{
 		fprintf(fpOut, "Execution %2.d - Execution Time %lf \n", i, (double)(end[0] - start) / CLOCKS_PER_SEC);
@@ -141,6 +141,9 @@ int main(int argc, char *argv[])
 			fprintf(fpOut, "Execution %2.d - Execution Time %lf \n", i, (double)(end[i] - end[i-1]) / CLOCKS_PER_SEC);
 		fprintf(fpOut, "\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
 		fprintf(fpOut, "\t Iterations: %d \n", jacobi->iterations);
+		fprintf(fpOut, "\t Solution: \n");
+		for(i=0; i<jacobi->size; i++)
+			fprintf(fpOut, "%lf\n", jacobi->b[i]);
 	}
 
 	// End
@@ -163,7 +166,7 @@ void PrintUsage()
 	printf("      See README for input format \n");
 	printf("      Default threads is 1 \n");
 	printf("      Default time will execute is 1 \n");
-	printf("      Output will not be saved by default and contains each individual execution time \n");
+	printf("      Output will not be saved by default and contains more information \n");
 }
 
 

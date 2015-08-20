@@ -95,6 +95,10 @@ int 	Jacobi_Verify(Jacobi *jacobi)
 
 	for(i=0; i<jacobi->size; i++)
 	{
+		// 0 value in diagonal
+		if(jacobi->A[i][i] == 0)
+			diverge = 2
+		// Diagonal value must be superior to the rest of the line added up
 		sum =0;
 		for(j=0; j<jacobi->size; j++)
 			sum += jacobi->A[i][j];
@@ -103,6 +107,7 @@ int 	Jacobi_Verify(Jacobi *jacobi)
 			diverge = 1;
 	}
 
+	// 0 -> Converges | 1 May Diverge | 2 ZERO div
 	return diverge;
 }
 
