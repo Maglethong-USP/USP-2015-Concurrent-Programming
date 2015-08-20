@@ -1,5 +1,4 @@
 #include "jacobi.h"
-#include <stdlib.h>
 
 
 #include "config.h"
@@ -9,16 +8,16 @@ int 	Jacobi_Init(Jacobi *jacobi)
 {
 	int i;
 
-	// Set all to null
-	jacobi->iterations = 0;
-	jacobi->threads	= 0;
-	jacobi->size 	= 0;
-	jacobi->A 		= NULL;
-	jacobi->b 		= NULL;
-	jacobi->x1 		= NULL;
-	jacobi->x2 		= NULL;
-	jacobi->thread 	= NULL;
-	jacobi->info 	= NULL;
+	// Set all to NULL
+	jacobi->iterations 	= 0;
+	jacobi->threadSize 	= 0;
+	jacobi->size 		= 0;
+	jacobi->A 			= NULL;
+	jacobi->b 			= NULL;
+	jacobi->x1 			= NULL;
+	jacobi->x2 			= NULL;
+	jacobi->thread 		= NULL;
+	jacobi->info 		= NULL;
 
 
 	// Allocating
@@ -28,29 +27,29 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	// Size
 	jacobi->size = 3;
 	// A
-	if( (jacobi->A = (j_type **) malloc(sizeof(j_type *) *jacobi->size) ) == null )
+	if( (jacobi->A = (j_type **) malloc(sizeof(j_type *) *jacobi->size) ) == NULL )
 		return 1;
 	// Set A[i] NULL
 	for(i=0; i<jacobi->size; i++)
-		A[i] = NULL;
+		jacobi->A[i] = NULL;
 	// A[i]
 	for(i=0; i<jacobi->size; i++)
-		if( (jacobi->A[i] = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == null )
+		if( (jacobi->A[i] = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == NULL )
 			return 1;
 	// b
-	if( (jacobi->b = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == null )
+	if( (jacobi->b = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == NULL )
 		return 1;
 	// x1
-	if( (jacobi->x1 = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == null )
+	if( (jacobi->x1 = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == NULL )
 		return 1;
 	// x2
-	if( (jacobi->x2 = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == null )
+	if( (jacobi->x2 = (j_type *) malloc(sizeof(j_type) *jacobi->size) ) == NULL )
 		return 1;
 	// thread
-	if( (jacobi->thread = (pthread_t *) malloc(sizeof(pthread_t) *jacobi->threadSize) ) == null )
+	if( (jacobi->thread = (pthread_t *) malloc(sizeof(pthread_t) *jacobi->threadSize) ) == NULL )
 		return 1;
 	// info
-	if( (jacobi->info = (struct _Jacobi_ThreadInfo *) malloc(sizeof(struct _Jacobi_ThreadInfo) *jacobi->threadSize) ) == null )
+	if( (jacobi->info = (struct _Jacobi_ThreadInfo *) malloc(sizeof(struct _Jacobi_ThreadInfo) *jacobi->threadSize) ) == NULL )
 		return 1;
 
 
@@ -106,8 +105,8 @@ void 	Jacobi_Destroy(Jacobi *jacobi)
 
 void 	Jacobi_Debug(Jacobi *jacobi)
 {
-	Jacobi_DebugMatrix(Jacobi *jacobi);
-	Jacobi_DebugUnknowns(Jacobi *jacobi);
+	Jacobi_DebugMatrix(jacobi);
+	Jacobi_DebugUnknowns(jacobi);
 }
 
 void 	Jacobi_DebugMatrix(Jacobi *jacobi)
@@ -127,7 +126,7 @@ void 	Jacobi_DebugMatrix(Jacobi *jacobi)
 
 void 	Jacobi_DebugUnknowns(Jacobi *jacobi)
 {
-	int i, 
+	int i;
 
 	// Print x
 	printf("Iteration %2.d - ", jacobi->iterations);
@@ -147,13 +146,13 @@ int 	Jacobi_Preprocess(Jacobi *jacobi)
 {
 	//! TODO [temporary only sequential]
 	int i;
-	_Jacobi_ThreadInfo info;
+	struct _Jacobi_ThreadInfo info;
 
 	// Init thread info
 	info.jacobi = jacobi;
 
 	// Start preprocessing each line
-	for(i=0; i< jacobi->size && !error; i++)
+	for(i=0; i< jacobi->size; i++)
 	{
 		info.line = i;
 		_Jacobi_SinglePreprocess2(&info);
@@ -167,7 +166,7 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 	//! TODO [temporary only sequential]
 	int i, j;
 	j_type precision;
-	_Jacobi_ThreadInfo info;
+	struct _Jacobi_ThreadInfo info;
 	j_type *tmp;
 
 	// Init thread info
@@ -178,10 +177,10 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 	{
 		// Iteration
 		jacobi->iterations++;
-		for(i=0; i< jacobi->size && !error; i++)
+		for(i=0; i< jacobi->size; i++)
 		{
 			info.line = i;
-			error = _Jacobi_SingleIteraction2(&info);
+			_Jacobi_SingleIteraction2(&info);
 		}
 		// Precision calc
 		precision = _Jacobi_CheckPrecision(jacobi->x1, jacobi->x2, jacobi->size);

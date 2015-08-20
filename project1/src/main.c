@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {
-	jacobi jacobi;
+	Jacobi jacobi;
 	int error;
 
 	// Init
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	// Preprocess
 	if( error = Jacobi_Preprocess(&jacobi) )
 	{
-		printf("Error #%dp!", );
+		printf("Error #%dp!", error);
 		Jacobi_Destroy(&jacobi);
 		return 0;
 	}
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	Jacobi_Debug(&jacobi);
 
 	// Jacobi Iterations
-	Jacobi_Run();
+	Jacobi_Run(&jacobi, PRECISION);
 
 	// End
 	Jacobi_Destroy(&jacobi);

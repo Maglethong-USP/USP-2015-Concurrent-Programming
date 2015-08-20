@@ -7,6 +7,9 @@
 //! Maximum number of iterations before error
 #define MAX_ITER 20
 
+#include <pthread.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 //! Defining type to be used on method
 typedef double j_type;
