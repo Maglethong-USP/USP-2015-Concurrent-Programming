@@ -2,8 +2,9 @@
 #define __CONFIG__
 
 
-#define MAX_ITER 20
 
 #define PRECISION 0.00005
+
+#define THREADS 4
 
 #endif
