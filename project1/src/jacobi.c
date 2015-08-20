@@ -4,7 +4,26 @@
 #include "config.h"
 
 
-int 	Jacobi_Init(Jacobi *jacobi)
+int 	Jacobi_ReadMatrices(Jacobi *jacobi, FILE *fp)
+{
+	int error = 0;
+	int i, j;
+
+
+	// Read Matrix A
+	for(i=0; i<jacobi->size; i++)
+		for(j=0; j<jacobi->size; j++)
+			fscanf(fp, "%lf", &(jacobi->A[i][j]));
+
+	// Read Matrix b
+	for(i=0; i<jacobi->size; i++)
+		fscanf(fp, "%lf", &(jacobi->b[i]));
+
+	// End
+	return error;
+}
+
+int 	Jacobi_Init(Jacobi *jacobi, int size, int threads)
 {
 	int i;
 	int linesPerThread;
@@ -24,9 +43,9 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	// Allocating
 
 	// Threads
-	jacobi->threadSize = THREADS;
+	jacobi->threadSize 	= threads;
 	// Size
-	jacobi->size = 3;
+	jacobi->size 		= size;
 
 	// A
 	if( (jacobi->A = (j_type **) malloc(sizeof(j_type *) *jacobi->size) ) == NULL )
@@ -54,29 +73,6 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	if( (jacobi->info = (struct _Jacobi_ThreadInfo *) malloc(sizeof(struct _Jacobi_ThreadInfo) *jacobi->threadSize) ) == NULL )
 		return 1;
 
-
-	// Initializing
-
-	// A
-	jacobi->A[0][0] = 10;	jacobi->A[0][1] = 2;	jacobi->A[0][2] = 1;
-	jacobi->A[1][0] = 1;	jacobi->A[1][1] = 5;	jacobi->A[1][2] = 1;
-	jacobi->A[2][0] = 2;	jacobi->A[2][1] = 3;	jacobi->A[2][2] = 10;
-
-	// b
-	jacobi->b[0] = 7;
-	jacobi->b[1] = -8;
-	jacobi->b[2] = 6;
-
-	// x1
-	jacobi->x1[0] = 0;
-	jacobi->x1[1] = 0;
-	jacobi->x1[2] = 0;
-
-	// x2
-	jacobi->x2[0] = 0;
-	jacobi->x2[1] = 0;
-	jacobi->x2[2] = 0;
-
 	// info
 	linesPerThread = ceil( (float)jacobi->size / (float)jacobi->threadSize);
 	for(i=0; i< jacobi->threadSize; i++)
@@ -91,18 +87,18 @@ int 	Jacobi_Init(Jacobi *jacobi)
 	return 0; 
 }
 
-void 	Jacobi_Verify(Jacobi *jacobi)
+int 	Jacobi_Verify(Jacobi *jacobi)
 {
 	int i, j;
 	int diverge = 0;
 	int sum;
 
-	for(i=0; i<jacobi.size; i++)
+	for(i=0; i<jacobi->size; i++)
 	{
 		sum =0;
-		for(j=0; j<jacobi.size; j++)
+		for(j=0; j<jacobi->size; j++)
 			sum += jacobi->A[i][j];
-		sum -= A[i][i] *2;
+		sum -= jacobi->A[i][i] *2;
 		if(sum > 0)
 			diverge = 1;
 	}
@@ -125,6 +121,17 @@ void 	Jacobi_Destroy(Jacobi *jacobi)
 			free(jacobi->A[i]);
 		free(jacobi->A);
 	}
+
+	// Set all to NULL
+	jacobi->iterations 	= 0;
+	jacobi->threadSize 	= 0;
+	jacobi->size 		= 0;
+	jacobi->A 			= NULL;
+	jacobi->b 			= NULL;
+	jacobi->x1 			= NULL;
+	jacobi->x2 			= NULL;
+	jacobi->thread 		= NULL;
+	jacobi->info 		= NULL;
 }
 
 void 	Jacobi_DebugThreads(Jacobi *jacobi)
@@ -176,6 +183,7 @@ void 	Jacobi_InitUnknowns(Jacobi *jacobi)
 	int i;
 	for(i=0; i<jacobi->size; i++)
 		jacobi->x1[i] = jacobi->b[i];
+	jacobi->iterations = 0;
 }
 
 int 	Jacobi_Preprocess(Jacobi *jacobi)
@@ -194,7 +202,7 @@ int 	Jacobi_Preprocess(Jacobi *jacobi)
 	return error;
 }
 
-int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
+int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision, int maxIter)
 {
 	//! TODO [temporary only sequential]
 	int i, j;
@@ -203,7 +211,7 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 	int error = 0;
 
 	// Run iterations
-	for(j=0; j< MAX_ITER; j++)
+	for(j=0; j< maxIter; j++)
 	{
 		jacobi->iterations++;
 
@@ -224,7 +232,9 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision)
 		jacobi->x2 = tmp;
 
 		// Debug
+		#ifdef DEBUG
 		Jacobi_DebugUnknowns(jacobi);
+		#endif
 
 		// Precision reach check
 		if(precision < desiredPrecision || error)

@@ -1,10 +1,7 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
-
-
-#define PRECISION 0.00005
-
-#define THREADS 4
+//! Uncomment to generate debug output
+#define DEBUG
 
 #endif
