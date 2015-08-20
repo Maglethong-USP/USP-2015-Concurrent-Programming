@@ -24,10 +24,47 @@ Objective of this project is to execute the [Jacobi Method](https://en.wikipedia
 Input
 -----
 
-	* TODO
+Input files require the following format:
 
 
-Execution
+size-of-the-system
+
+```
+row-test					# the row to be used to verify the result`
+error 						# the precision we are aiming for
+max-iterations				# maximum number of iterations. after this the program will exit
+a00 a01 a02 ... a0n			# First line of the coefficients matrix
+a10 a11 a12 ... a1n			# 	and so on
+...
+an0 an1 an2 ... ann
+b0							# First line of the constants matrix
+b1							# 	and so on
+...
+bn
+```
+
+
+Example input files can be found in `./project1/doc/inputs/`
+
+
+Compilation and Execution
 ---------
 
-	* TODO
+To compile run:
+
+	`make`
+
+or
+
+	`gcc -o ./bin/prog -I ./lib/ -lm -pthread ./src/*.c`
+
+
+To execute run:
+
+	`./bin/prog input-file-name [ number-of-threads [ number-of-times-to-execute [ output-file-name ] ] ]`
+
+Defalut values are:
+
+- number-of-threads - 1
+- number-of-times-to-execute - 1
+- output-file-name - none
