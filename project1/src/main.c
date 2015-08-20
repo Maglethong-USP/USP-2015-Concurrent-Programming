@@ -126,12 +126,17 @@ int main(int argc, char *argv[])
 	stdDeviation = sqrt(stdDeviation);
 
 	// Desired output
+	#ifdef DIRTY_OUTPUT
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Iterations: %d \n", jacobi->iterations);
 	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, jacobi->x1[J_ROW_TEST], jacobi->b[J_ROW_TEST]); //! TODO [fix this]
 	printf("-------------------------------------------------------------------------------\n");
+	#else
+	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
+	printf("-------------------------------------------------------------------------------\n");
+	#endif
 
 	// If user wants file with more output
 	if(fpOut)
