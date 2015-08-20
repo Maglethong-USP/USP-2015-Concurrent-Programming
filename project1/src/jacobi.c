@@ -97,9 +97,9 @@ int 	Jacobi_Verify(Jacobi *jacobi)
 	{
 		// 0 value in diagonal
 		if(jacobi->A[i][i] == 0)
-			diverge = 2
+			diverge = 2;
 		// Diagonal value must be superior to the rest of the line added up
-		sum =0;
+		sum = 0;
 		for(j=0; j<jacobi->size; j++)
 			sum += jacobi->A[i][j];
 		sum -= jacobi->A[i][i] *2;
