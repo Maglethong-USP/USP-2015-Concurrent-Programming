@@ -167,10 +167,10 @@ int main(int argc, char *argv[])
 void PrintUsage()
 {
 	printf("Usage: \n");
-	printf("   ./prog <input file> [threads to use] [times to execute] [output file] \n");
+	printf("   ./prog input-file-name [ number-of-threads [ number-of-times-to-execute [ output-file-name ] ] ] \n");
 	printf("      See README for input format \n");
 	printf("      Default threads is 1 \n");
-	printf("      Default time will execute is 1 \n");
+	printf("      Default number of times will execute is 1 \n");
 	printf("      Output will not be saved by default and contains more information \n");
 }
 
