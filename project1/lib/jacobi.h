@@ -51,8 +51,11 @@ struct _Jacobi_ThreadInfo
 //! Verify if the method is guaranteed to converge
 /*!
 	/param jacobi			The initialized Jacobi struct with its matrices properly read
+	/return					0 - Convergence guaranteed
+							1 - Convergence not guaranteed
+							2 - Diagonal as ZERO value
 */
-void 	Jacobi_Verify(Jacobi *jacobi);
+int 	Jacobi_Verify(Jacobi *jacobi);
 
 
 //! Initialize the Jacobi struct.
@@ -60,8 +63,12 @@ void 	Jacobi_Verify(Jacobi *jacobi);
 	This will not set the matrices, it will only prepare the struct.
 	Use Jacobi_Destroy() to terminate it afterwards.
 	/param jacobi			Reference to the Jacobi struct
+	/param size				The size of the system
+	/param threads			Number of threads that will run
+	/return					0 - No Error
+							1 - Memory allocation error
 */
-int 	Jacobi_Init(Jacobi *jacobi);
+int 	Jacobi_Init(Jacobi *jacobi, int size, int threads);
 
 
 //! Destroys the Jacoby struct and frees the used memory
@@ -126,10 +133,11 @@ int 	Jacobi_Preprocess(Jacobi *jacobi);
 /*!
 	/param jacobi			The initialized Jacobi struct
 	/param desiredPrecision	The desired precision the method will try to reach
+	/param maxIter			Maximum number of iterations that will run
 	/param return			0	if no error
 							> 0	if error related to threads
 */
-int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision);
+int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision, int maxIter);
 
 
 //! Processes some lines of the constants and the coefficients matrices fur further use
