@@ -2,6 +2,8 @@
 max_threads=10
 times_to_execute=10
 
+# Saving script start time
+date >> execTime
 
 # Compile program
 make
@@ -22,6 +24,10 @@ do
 		in_file_name="./doc/inputs/"$j".txt"
 		out_file_name="./out/"$j"-"$i"t.txt"
 		echo "./bin/prog $in_file_name $1 $times_to_execute $out_file_name"
-#		./bin/prog $in_file_name $i $times_to_execute $out_file_name
+		./bin/prog $in_file_name $i $times_to_execute $out_file_name
 	done
 done
+
+date >> execTime
+
+echo " ------------------------------ " >> execTime
