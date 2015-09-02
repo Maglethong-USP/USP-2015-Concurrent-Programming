@@ -27,6 +27,7 @@ int 	Jacobi_Init(Jacobi *jacobi, int size, int threads)
 {
 	int i;
 	int linesPerThread;
+	int error;
 
 	// Set all to NULL
 	jacobi->iterations 	= 0;
@@ -38,6 +39,7 @@ int 	Jacobi_Init(Jacobi *jacobi, int size, int threads)
 	jacobi->x2 			= NULL;
 	jacobi->thread 		= NULL;
 	jacobi->info 		= NULL;
+	jacobi->threadSync 	= NULL;
 
 
 	// Allocating
@@ -80,8 +82,28 @@ int 	Jacobi_Init(Jacobi *jacobi, int size, int threads)
 		jacobi->info[i].jacobi = jacobi;
 		jacobi->info[i].lineStart = i *linesPerThread;
 		jacobi->info[i].lineEnd = (i +1) *linesPerThread -1;
+		jacobi->info[i].num = i;
 	}
 	jacobi->info[jacobi->threadSize -1].lineEnd = jacobi->size -1;
+
+	// Mutexes
+	if( (jacobi->threadSync = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t) *jacobi->threadSize) ) == NULL )
+		return 1;
+
+	for(i=0; i<jacobi->threadSize; i++)
+	{
+		if( error = pthread_mutex_init(jacobi->threadSync +i, NULL) )
+			return error +10;
+		// Lock mutex [Want my thread to start asleep]
+		pthread_mutex_lock(jacobi->threadSync +i);
+	}
+
+	if( error = pthread_mutex_init( &(jacobi->resultSync), NULL) )
+		return error +10;
+
+	// Semaphore
+		if( error = sem_init( &(jacobi->mainSync), 0, 0 ) )
+			return error +100;
 
 	// Success
 	return 0; 
@@ -115,6 +137,15 @@ void 	Jacobi_Destroy(Jacobi *jacobi)
 {
 	int i;
 
+	
+	sem_destroy( &(jacobi->mainSync) );
+	pthread_mutex_destroy( &(jacobi->resultSync) );
+	if(jacobi->threadSync)
+	{
+		for(i=0; i<jacobi->threadSize; i++)	
+			pthread_mutex_destroy(jacobi->threadSync +1);
+		free(jacobi->threadSync);
+	}
 	free(jacobi->info);
 	free(jacobi->thread);
 	free(jacobi->x2);
@@ -137,6 +168,7 @@ void 	Jacobi_Destroy(Jacobi *jacobi)
 	jacobi->x2 			= NULL;
 	jacobi->thread 		= NULL;
 	jacobi->info 		= NULL;
+	jacobi->threadSync 	= NULL;
 }
 
 void 	Jacobi_DebugThreads(Jacobi *jacobi)
@@ -209,24 +241,28 @@ int 	Jacobi_Preprocess(Jacobi *jacobi)
 
 int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision, int maxIter)
 {
-	//! TODO [temporary only sequential]
 	int i, j;
 	j_type precision;
 	j_type *tmp;
 	int error = 0;
 
+	// Create threads
+	for(i=0; i< jacobi->threadSize && !error; i++)
+		// Create thread
+		error = pthread_create(jacobi->thread +i, NULL, (void * (*)(void *)) _Jacobi_Thread, (void *)(jacobi->info +i));
+
 	// Run iterations
-	for(j=0; j< maxIter; j++)
+	for(i=0; i< maxIter; i++)
 	{
 		jacobi->iterations++;
 
-		// Create threads
-		for(i=0; i< jacobi->threadSize && !error; i++)
-			error = pthread_create(jacobi->thread +i, NULL, (void * (*)(void *)) _Jacobi_ThreadIteraction, (void *)(jacobi->info +i));
-		
-		// Join threads to synchronize
-		for(i=0; i< jacobi->threadSize && !error; i++)
-			error = pthread_join(jacobi->thread[i], NULL);
+		// Unlock each thread's mutex allowing it a new iteration
+		for(j=0; j<jacobi->threadSize; j++)
+			pthread_mutex_unlock(jacobi->threadSync +j);
+
+		// Lower semaphore [child thread count] times to wait till they all finish
+		for(j=0; j<jacobi->threadSize; j++)
+			sem_wait( &(jacobi->mainSync) );
 
 		// Precision calc
 		precision = _Jacobi_CheckPrecision(jacobi->x1, jacobi->x2, jacobi->size);
@@ -246,7 +282,46 @@ int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision, int maxIter)
 			break;
 	}
 
+	// Kill all child threads
+	for(i=0; i<jacobi->threadSize; i++)
+		pthread_cancel(jacobi->thread[i]);
+
 	return error;
+}
+
+void 	_Jacobi_Thread(struct _Jacobi_ThreadInfo *info)
+{
+	int i, j;
+	j_type *tmp;	// To temporarily store results avoiding cache bouncing
+
+	// Allocating
+	if( (tmp = (j_type *) malloc( sizeof(j_type) *(info->lineEnd - info->lineStart +1) )) == NULL )
+		return;
+
+	// Run indefinitely. Main will have to kill me
+	while(1)
+	{
+		// Lock this thread's mutex allowing only one iteration
+		pthread_mutex_lock(info->jacobi->threadSync +(info->num));
+
+		// Calculate one iteration
+		//_Jacobi_ThreadIteration(info);
+
+		for(i = info->lineStart, j=0; i <= info->lineEnd; i++, j++)
+			tmp[j] = _Jacobi_SingleIteration(info->jacobi->A, info->jacobi->b, info->jacobi->x1, i, info->jacobi->size);
+
+		// Copy temporary array to results
+		pthread_mutex_lock( &(info->jacobi->resultSync) );
+		for(i = info->lineStart, j=0; i <= info->lineEnd; i++, j++)
+			info->jacobi->x2[i] = tmp[j];
+		pthread_mutex_unlock( &(info->jacobi->resultSync) );
+
+		// Raise the semaphore
+		sem_post( &(info->jacobi->mainSync) );
+	}
+
+	// Free
+	free(tmp);
 }
 
 void 	_Jacobi_ThreadPreprocess(struct _Jacobi_ThreadInfo *info)
@@ -271,15 +346,7 @@ void 	_Jacobi_SinglePreprocess(j_type **A, j_type *b, int i, int size)
 	b[i] /= diagonal;
 }
 
-void 	_Jacobi_ThreadIteraction(struct _Jacobi_ThreadInfo *info)
-{
-	int i;
-
-	for(i = info->lineStart; i <= info->lineEnd; i++)
-		info->jacobi->x2[i] = _Jacobi_SingleIteraction(info->jacobi->A, info->jacobi->b, info->jacobi->x1, i, info->jacobi->size);
-}
-
-j_type	_Jacobi_SingleIteraction(j_type **A, j_type *b, j_type *x, int i, int size)
+j_type	_Jacobi_SingleIteration(j_type **A, j_type *b, j_type *x, int i, int size)
 {
 	j_type res = 0;
 	int j;

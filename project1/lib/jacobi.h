@@ -5,6 +5,7 @@
 #define __JACOBI__
 
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>		// for ceil()
@@ -33,6 +34,38 @@ typedef struct _Jacobi
 	struct _Jacobi_ThreadInfo *info;
 	//! Iteration counter
 	int iterations;
+
+	//! One mutex for each thread to sync to
+	/*
+		Each thread that calculates iterations will lock its own mutex
+		after calculating one iteration going to sleep until the main
+		thread unlocks it guaranteeing the thread will only calculate
+		one iteration before the main thread orders another iteration.
+
+		child 	locks it
+		main 	unlocks it
+	*/
+	pthread_mutex_t *threadSync;
+	//! One mutex so the threads don't write results at the same time
+	/*
+		Mainly to avoid cache bouncing when multiple threads try to
+		write on the same array simultaneously. They all write in
+		independent places, but they are all close to each other so
+		the cache might go crazy and cause some delay.
+	*/
+	pthread_mutex_t resultSync;
+	//! Semaphore for main thread to sync to children thread iterations
+	/*
+		The main thread will decrement the number of children threads
+		from it while the child threads will increase it again
+		guaranteeing all threads will calculate one iteration before
+		the main thread continues.
+
+		main decreases it [child count] times
+		child increases once
+	*/
+	sem_t mainSync;
+	
 } Jacobi;
 
 //! Struct with information for a thread
@@ -44,6 +77,8 @@ struct _Jacobi_ThreadInfo
 	int lineStart;
 	//! End of the lines this thread will process
 	int lineEnd;
+	//! Number of this thread
+	int num;
 };
 
 
@@ -65,8 +100,10 @@ int 	Jacobi_Verify(Jacobi *jacobi);
 	/param jacobi			Reference to the Jacobi struct
 	/param size				The size of the system
 	/param threads			Number of threads that will run
-	/return					0 - No Error
-							1 - Memory allocation error
+	/return					0 		- No Error
+							1 		- Memory allocation error
+							> 10 	- Mutex initialization error
+							> 100 	- Semaphore initialization error
 */
 int 	Jacobi_Init(Jacobi *jacobi, int size, int threads);
 
@@ -140,18 +177,19 @@ int 	Jacobi_Preprocess(Jacobi *jacobi);
 int 	Jacobi_Run(Jacobi *jacobi, j_type desiredPrecision, int maxIter);
 
 
+//! Job of one thread
+/*!
+	/param info				Thread information struct containing line range to process and reference to the Jacobi struct
+*/
+void 	_Jacobi_Thread(struct _Jacobi_ThreadInfo *info);
+
+
 //! Processes some lines of the constants and the coefficients matrices fur further use
 /*!
 	/param info				Thread information struct containing line range to process and reference to the Jacobi struct
 */
 void 	_Jacobi_ThreadPreprocess(struct _Jacobi_ThreadInfo *info);
 
-
-//! Calculates the next iteration of the Jacobi method for some lines
-/*!
-	/param info				Thread information struct containing line range to calculate and reference to the Jacobi struct
-*/
-void 	_Jacobi_ThreadIteraction(struct _Jacobi_ThreadInfo *info);
 
 //! [Internal] Calculates one iteration of one single unknown
 /*!
@@ -165,7 +203,7 @@ void 	_Jacobi_ThreadIteraction(struct _Jacobi_ThreadInfo *info);
 	/param size				The size of the system (number of equations)
 	/return					The updated value of the unknown of this line
 */
-j_type _Jacobi_SingleIteraction(j_type **coefficients, j_type *constants, j_type *unknowns, int line, int size);
+j_type _Jacobi_SingleIteration(j_type **coefficients, j_type *constants, j_type *unknowns, int line, int size);
 
 
 //! [Internal] Processes input matrices for other functions. Only one single line is preprocessed.
