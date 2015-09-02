@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 	int i;
 	int J_ORDER, J_ROW_TEST, J_ITE_MAX;
 	j_type J_ERROR;
+	j_type rowTestVal = 0;
 	int threads = 1;
 	int error;
 	FILE *fp = NULL;
@@ -127,11 +128,15 @@ int main(int argc, char *argv[])
 
 	// Desired output
 	#ifdef DIRTY_OUTPUT
+	for(i=0; i<jacobi->size; i++)
+		rowTestVal += jacobi->A[J_ROW_TEST][i] *jacobi->x1[i];
+	rowTestVal += jacobi->x1[J_ROW_TEST]; // Cuz the diagonal was set to 0
+
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Iterations: %d \n", jacobi->iterations);
-	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, jacobi->x1[J_ROW_TEST], jacobi->b[J_ROW_TEST]); //! TODO [fix this]
+	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, rowTestVal, jacobi->b[J_ROW_TEST]); //! TODO [fix this]
 	printf("-------------------------------------------------------------------------------\n");
 	#else
 	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
