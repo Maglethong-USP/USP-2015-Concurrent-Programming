@@ -23,7 +23,7 @@ do
 		echo "Executing for $j Matix - $i Threads"
 		in_file_name="./doc/inputs/"$j".txt"
 		out_file_name="./out/"$j"-"$i"t.txt"
-		echo "./bin/prog $in_file_name $1 $times_to_execute $out_file_name"
+		echo "./bin/prog $in_file_name $i $times_to_execute $out_file_name"
 		./bin/prog $in_file_name $i $times_to_execute $out_file_name
 	done
 done
