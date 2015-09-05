@@ -9,6 +9,20 @@
 
 
 
+
+void TimeToString(char *string, unsigned long long millisecs)
+{
+	unsigned int min = (unsigned int) (millisecs / (1000 *60) );
+	millisecs -= (1000 *60) *min;
+	unsigned int sec = (unsigned int) (millisecs / 1000);
+	millisecs -= 1000 *sec;
+	unsigned int msec = (unsigned int) millisecs;
+
+	sprintf(string, "%.2u:%.2u,%.3u", min, sec, msec);
+}
+
+
+
 int RunMethod(Jacobi *jacobi, j_type J_ERROR, int J_ITE_MAX);
 
 void PrintUsage();
@@ -25,11 +39,13 @@ int main(int argc, char *argv[])
 	FILE *fp = NULL;
 	FILE *fpOut = NULL;
 	int timesToExecute = 1;
+	char tmp1[100], tmp2[100];
 	//! Execution times
-	clock_t start;
-	clock_t *end = NULL;
-	double avarageTime = 0;
-	double stdDeviation = 0;
+	struct timespec start;
+	struct timespec end;
+	unsigned long long int *execTime = NULL;
+	unsigned long long int avarageTime;
+	unsigned long long int stdDeviation;
 
 	// Handling arguments
 	if( argc < 2 )
@@ -49,7 +65,7 @@ int main(int argc, char *argv[])
 		};
 
 	// Allocate all those execution times
-	if( (end = (clock_t *) malloc(sizeof(clock_t) *timesToExecute)) == NULL )
+	if( (execTime = (unsigned long long int *) malloc(sizeof(unsigned long long int) *timesToExecute)) == NULL )
 	{
 		printf("Error allocating memory!\n");
 		goto end;
@@ -98,32 +114,38 @@ int main(int argc, char *argv[])
 		goto end;
 	}
 
-	// Starting timer
-	start = clock();
 
 	// Running method
+	avarageTime = 0;
 	for(i=0; i<timesToExecute; i++)
 	{
+		// Starting timer
+		clock_gettime(CLOCK_MONOTONIC, &start);
+
+		// Run
 		if( error = RunMethod(jacobi, J_ERROR, J_ITE_MAX) )
 		{
 			printf("Error #%dx!\n", error);
 			goto end;
 		}
-		end[i] = clock();
+
+		// Stop timer and calculate time
+		clock_gettime(CLOCK_MONOTONIC, &end);
+		execTime[i] = (unsigned long long int) 
+		(
+	 		(end.tv_sec - start.tv_sec) * 1000 + // Seconds to milliseconds 
+			(end.tv_nsec - start.tv_sec) / 1000000 // Nanoseconds to milliseconds
+		);
+		avarageTime += execTime[i];
 	}
-	
-		
-	// Calculate average and std. Deviation
-	avarageTime = (double)(end[timesToExecute -1] - start) / CLOCKS_PER_SEC;
+
+	// Calculate average time
 	avarageTime /= timesToExecute;
 
-	stdDeviation = (double) (end[0] - start)/CLOCKS_PER_SEC -avarageTime;
-	stdDeviation = stdDeviation *stdDeviation;
-	for(i=1; i<timesToExecute; i++)
-	{
-		double tmp = (double) (end[i] - end[i-1])/CLOCKS_PER_SEC -avarageTime;
-		stdDeviation += tmp *tmp;
-	}
+	// Calculate standard deviations
+	stdDeviation = 0;
+	for(i=0; i<timesToExecute; i++)
+		stdDeviation += (execTime[i] - avarageTime)*(execTime[i] - avarageTime);
 	stdDeviation = sqrt(stdDeviation);
 
 	// Desired output
@@ -133,23 +155,31 @@ int main(int argc, char *argv[])
 	rowTestVal += jacobi->x1[J_ROW_TEST]; // Cuz the diagonal was set to 0
 
 	printf("-------------------------------------------------------------------------------\n");
-	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
+	TimeToString(tmp1, avarageTime);
+	TimeToString(tmp2, stdDeviation);
+	printf("\t Average Execution Time: %s +/- %s \n", tmp1, tmp2);
 	printf("-------------------------------------------------------------------------------\n");
 	printf("\t Iterations: %d \n", jacobi->iterations);
 	printf("\t RowTest: %d => %lf =? %lf \n", J_ROW_TEST, rowTestVal, jacobi->b[J_ROW_TEST]); //! TODO [fix this]
 	printf("-------------------------------------------------------------------------------\n");
 	#else
-	printf("\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
+	TimeToString(tmp1, avarageTime);
+	TimeToString(tmp2, stdDeviation);
+	printf("\t Average Execution Time: %s +/- %s \n", tmp1, tmp2);
 	printf("-------------------------------------------------------------------------------\n");
 	#endif
 
 	// If user wants file with more output
 	if(fpOut)
 	{
-		fprintf(fpOut, "Execution %2.d - Execution Time %lf \n", i, (double)(end[0] - start) / CLOCKS_PER_SEC);
 		for(i=1; i<timesToExecute; i++)
-			fprintf(fpOut, "Execution %2.d - Execution Time %lf \n", i, (double)(end[i] - end[i-1]) / CLOCKS_PER_SEC);
-		fprintf(fpOut, "\t Average Execution Time:  %lf  +/- %lf \n", avarageTime, stdDeviation);
+		{
+			TimeToString(tmp1, execTime[i]);
+			fprintf(fpOut, "Execution %2.d - Execution Time %s \n", i, tmp1);
+		}
+		TimeToString(tmp1, avarageTime);
+		TimeToString(tmp2, stdDeviation);
+		fprintf(fpOut, "\t Average Execution Time: %s +/- %s \n", tmp1, tmp2);
 		fprintf(fpOut, "\t Iterations: %d \n", jacobi->iterations);
 		fprintf(fpOut, "\t Solution: \n");
 		for(i=0; i<jacobi->size; i++)
@@ -157,8 +187,8 @@ int main(int argc, char *argv[])
 	}
 
 	// End
-	end:
-	free(end);
+end:
+	free(execTime);
 	if(fpOut != NULL)
 		fclose(fpOut);
 	if(fp != NULL)

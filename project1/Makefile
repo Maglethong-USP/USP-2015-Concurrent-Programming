@@ -30,7 +30,7 @@ ZIP			=	project1
 ZIP_FILES	=	./Makefile ./README.txt ./LICENSE
 
 # Flags
-FLAGS 		=	-lm -pthread
+FLAGS 		=	-lm -pthread -lrt
 
 
 ################
