@@ -55,7 +55,7 @@ To compile run:
 
 or
 
-	gcc -o ./bin/prog -I ./lib/ -lm -pthread ./src/*.c
+	gcc -o ./bin/prog -I ./lib/ -lm -pthread -lrt ./src/*.c
 
 
 To execute run:
