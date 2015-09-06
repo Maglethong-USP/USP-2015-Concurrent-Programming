@@ -1,0 +1,284 @@
+removed './bin/prog'
+removed directory: './bin'
+mkdir: created directory './bin'
+gcc -I./lib -o ./bin/prog ./src/*.c -lm -pthread -lrt
+Executing for 250 Matix - 1 Threads
+./bin/prog ./doc/inputs/250.txt 1 10 ./out/250-1t.txt
+	 Average Execution Time: 00:01,981 +/- 00:00,948 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 2 Threads
+./bin/prog ./doc/inputs/250.txt 2 10 ./out/250-2t.txt
+	 Average Execution Time: 00:01,289 +/- 00:00,909 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 3 Threads
+./bin/prog ./doc/inputs/250.txt 3 10 ./out/250-3t.txt
+	 Average Execution Time: 00:00,942 +/- 00:01,020 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 4 Threads
+./bin/prog ./doc/inputs/250.txt 4 10 ./out/250-4t.txt
+	 Average Execution Time: 00:01,043 +/- 00:00,929 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 5 Threads
+./bin/prog ./doc/inputs/250.txt 5 10 ./out/250-5t.txt
+	 Average Execution Time: 00:01,036 +/- 00:00,974 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 6 Threads
+./bin/prog ./doc/inputs/250.txt 6 10 ./out/250-6t.txt
+	 Average Execution Time: 00:00,861 +/- 00:00,931 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 7 Threads
+./bin/prog ./doc/inputs/250.txt 7 10 ./out/250-7t.txt
+	 Average Execution Time: 00:01,025 +/- 00:00,913 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 8 Threads
+./bin/prog ./doc/inputs/250.txt 8 10 ./out/250-8t.txt
+	 Average Execution Time: 00:00,991 +/- 00:00,797 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 9 Threads
+./bin/prog ./doc/inputs/250.txt 9 10 ./out/250-9t.txt
+	 Average Execution Time: 00:00,990 +/- 00:00,928 
+-------------------------------------------------------------------------------
+Executing for 250 Matix - 10 Threads
+./bin/prog ./doc/inputs/250.txt 10 10 ./out/250-10t.txt
+	 Average Execution Time: 00:00,908 +/- 00:01,042 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 1 Threads
+./bin/prog ./doc/inputs/500.txt 1 10 ./out/500-1t.txt
+	 Average Execution Time: 00:06,730 +/- 00:06,548 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 2 Threads
+./bin/prog ./doc/inputs/500.txt 2 10 ./out/500-2t.txt
+	 Average Execution Time: 00:04,644 +/- 00:02,578 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 3 Threads
+./bin/prog ./doc/inputs/500.txt 3 10 ./out/500-3t.txt
+	 Average Execution Time: 00:03,251 +/- 00:02,377 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 4 Threads
+./bin/prog ./doc/inputs/500.txt 4 10 ./out/500-4t.txt
+	 Average Execution Time: 00:03,237 +/- 00:02,576 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 5 Threads
+./bin/prog ./doc/inputs/500.txt 5 10 ./out/500-5t.txt
+	 Average Execution Time: 00:02,930 +/- 00:01,481 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 6 Threads
+./bin/prog ./doc/inputs/500.txt 6 10 ./out/500-6t.txt
+	 Average Execution Time: 00:02,077 +/- 00:00,972 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 7 Threads
+./bin/prog ./doc/inputs/500.txt 7 10 ./out/500-7t.txt
+	 Average Execution Time: 00:01,871 +/- 00:00,906 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 8 Threads
+./bin/prog ./doc/inputs/500.txt 8 10 ./out/500-8t.txt
+	 Average Execution Time: 00:01,966 +/- 00:01,398 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 9 Threads
+./bin/prog ./doc/inputs/500.txt 9 10 ./out/500-9t.txt
+	 Average Execution Time: 00:03,132 +/- 00:02,088 
+-------------------------------------------------------------------------------
+Executing for 500 Matix - 10 Threads
+./bin/prog ./doc/inputs/500.txt 10 10 ./out/500-10t.txt
+	 Average Execution Time: 00:02,506 +/- 00:01,996 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 1 Threads
+./bin/prog ./doc/inputs/1000.txt 1 10 ./out/1000-1t.txt
+	 Average Execution Time: 00:31,470 +/- 00:14,608 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 2 Threads
+./bin/prog ./doc/inputs/1000.txt 2 10 ./out/1000-2t.txt
+	 Average Execution Time: 00:14,941 +/- 00:04,168 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 3 Threads
+./bin/prog ./doc/inputs/1000.txt 3 10 ./out/1000-3t.txt
+	 Average Execution Time: 00:12,335 +/- 00:03,507 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 4 Threads
+./bin/prog ./doc/inputs/1000.txt 4 10 ./out/1000-4t.txt
+	 Average Execution Time: 00:11,201 +/- 00:03,105 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 5 Threads
+./bin/prog ./doc/inputs/1000.txt 5 10 ./out/1000-5t.txt
+	 Average Execution Time: 00:12,808 +/- 00:02,160 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 6 Threads
+./bin/prog ./doc/inputs/1000.txt 6 10 ./out/1000-6t.txt
+	 Average Execution Time: 00:10,278 +/- 00:00,995 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 7 Threads
+./bin/prog ./doc/inputs/1000.txt 7 10 ./out/1000-7t.txt
+	 Average Execution Time: 00:09,336 +/- 00:00,873 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 8 Threads
+./bin/prog ./doc/inputs/1000.txt 8 10 ./out/1000-8t.txt
+	 Average Execution Time: 00:09,074 +/- 00:00,962 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 9 Threads
+./bin/prog ./doc/inputs/1000.txt 9 10 ./out/1000-9t.txt
+	 Average Execution Time: 00:11,882 +/- 00:02,923 
+-------------------------------------------------------------------------------
+Executing for 1000 Matix - 10 Threads
+./bin/prog ./doc/inputs/1000.txt 10 10 ./out/1000-10t.txt
+	 Average Execution Time: 00:10,512 +/- 00:01,178 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 1 Threads
+./bin/prog ./doc/inputs/1500.txt 1 10 ./out/1500-1t.txt
+	 Average Execution Time: 01:19,029 +/- 00:25,178 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 2 Threads
+./bin/prog ./doc/inputs/1500.txt 2 10 ./out/1500-2t.txt
+	 Average Execution Time: 00:40,557 +/- 00:08,601 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 3 Threads
+./bin/prog ./doc/inputs/1500.txt 3 10 ./out/1500-3t.txt
+	 Average Execution Time: 00:33,098 +/- 00:00,929 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 4 Threads
+./bin/prog ./doc/inputs/1500.txt 4 10 ./out/1500-4t.txt
+	 Average Execution Time: 00:27,863 +/- 00:05,052 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 5 Threads
+./bin/prog ./doc/inputs/1500.txt 5 10 ./out/1500-5t.txt
+	 Average Execution Time: 00:35,737 +/- 00:04,450 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 6 Threads
+./bin/prog ./doc/inputs/1500.txt 6 10 ./out/1500-6t.txt
+	 Average Execution Time: 00:28,894 +/- 00:01,179 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 7 Threads
+./bin/prog ./doc/inputs/1500.txt 7 10 ./out/1500-7t.txt
+	 Average Execution Time: 00:26,714 +/- 00:00,989 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 8 Threads
+./bin/prog ./doc/inputs/1500.txt 8 10 ./out/1500-8t.txt
+	 Average Execution Time: 00:23,890 +/- 00:00,975 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 9 Threads
+./bin/prog ./doc/inputs/1500.txt 9 10 ./out/1500-9t.txt
+	 Average Execution Time: 00:32,849 +/- 00:03,271 
+-------------------------------------------------------------------------------
+Executing for 1500 Matix - 10 Threads
+./bin/prog ./doc/inputs/1500.txt 10 10 ./out/1500-10t.txt
+	 Average Execution Time: 00:28,987 +/- 00:01,140 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 1 Threads
+./bin/prog ./doc/inputs/2000.txt 1 10 ./out/2000-1t.txt
+	 Average Execution Time: 02:40,185 +/- 00:30,104 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 2 Threads
+./bin/prog ./doc/inputs/2000.txt 2 10 ./out/2000-2t.txt
+	 Average Execution Time: 01:24,605 +/- 00:14,850 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 3 Threads
+./bin/prog ./doc/inputs/2000.txt 3 10 ./out/2000-3t.txt
+	 Average Execution Time: 01:09,856 +/- 00:00,998 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 4 Threads
+./bin/prog ./doc/inputs/2000.txt 4 10 ./out/2000-4t.txt
+	 Average Execution Time: 00:52,775 +/- 00:01,296 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 5 Threads
+./bin/prog ./doc/inputs/2000.txt 5 10 ./out/2000-5t.txt
+	 Average Execution Time: 01:08,851 +/- 00:04,053 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 6 Threads
+./bin/prog ./doc/inputs/2000.txt 6 10 ./out/2000-6t.txt
+	 Average Execution Time: 01:01,363 +/- 00:01,361 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 7 Threads
+./bin/prog ./doc/inputs/2000.txt 7 10 ./out/2000-7t.txt
+	 Average Execution Time: 00:57,175 +/- 00:00,910 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 8 Threads
+./bin/prog ./doc/inputs/2000.txt 8 10 ./out/2000-8t.txt
+	 Average Execution Time: 00:51,388 +/- 00:01,340 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 9 Threads
+./bin/prog ./doc/inputs/2000.txt 9 10 ./out/2000-9t.txt
+	 Average Execution Time: 01:04,739 +/- 00:02,666 
+-------------------------------------------------------------------------------
+Executing for 2000 Matix - 10 Threads
+./bin/prog ./doc/inputs/2000.txt 10 10 ./out/2000-10t.txt
+	 Average Execution Time: 01:00,316 +/- 00:01,335 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 1 Threads
+./bin/prog ./doc/inputs/3000.txt 1 10 ./out/3000-1t.txt
+	 Average Execution Time: 06:55,816 +/- 00:28,429 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 2 Threads
+./bin/prog ./doc/inputs/3000.txt 2 10 ./out/3000-2t.txt
+	 Average Execution Time: 03:55,865 +/- 00:06,546 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 3 Threads
+./bin/prog ./doc/inputs/3000.txt 3 10 ./out/3000-3t.txt
+	 Average Execution Time: 03:24,489 +/- 00:01,608 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 4 Threads
+./bin/prog ./doc/inputs/3000.txt 4 10 ./out/3000-4t.txt
+	 Average Execution Time: 02:32,834 +/- 00:00,850 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 5 Threads
+./bin/prog ./doc/inputs/3000.txt 5 10 ./out/3000-5t.txt
+	 Average Execution Time: 03:06,405 +/- 00:02,478 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 6 Threads
+./bin/prog ./doc/inputs/3000.txt 6 10 ./out/3000-6t.txt
+	 Average Execution Time: 02:55,092 +/- 00:01,050 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 7 Threads
+./bin/prog ./doc/inputs/3000.txt 7 10 ./out/3000-7t.txt
+	 Average Execution Time: 02:46,494 +/- 00:01,663 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 8 Threads
+./bin/prog ./doc/inputs/3000.txt 8 10 ./out/3000-8t.txt
+	 Average Execution Time: 02:27,288 +/- 00:01,052 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 9 Threads
+./bin/prog ./doc/inputs/3000.txt 9 10 ./out/3000-9t.txt
+	 Average Execution Time: 02:48,255 +/- 00:02,037 
+-------------------------------------------------------------------------------
+Executing for 3000 Matix - 10 Threads
+./bin/prog ./doc/inputs/3000.txt 10 10 ./out/3000-10t.txt
+	 Average Execution Time: 02:44,711 +/- 00:02,554 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 1 Threads
+./bin/prog ./doc/inputs/4000.txt 1 10 ./out/4000-1t.txt
+	 Average Execution Time: 14:36,336 +/- 00:47,966 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 2 Threads
+./bin/prog ./doc/inputs/4000.txt 2 10 ./out/4000-2t.txt
+	 Average Execution Time: 08:18,585 +/- 00:17,491 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 3 Threads
+./bin/prog ./doc/inputs/4000.txt 3 10 ./out/4000-3t.txt
+	 Average Execution Time: 07:10,831 +/- 00:09,322 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 4 Threads
+./bin/prog ./doc/inputs/4000.txt 4 10 ./out/4000-4t.txt
+	 Average Execution Time: 05:22,028 +/- 00:01,084 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 5 Threads
+./bin/prog ./doc/inputs/4000.txt 5 10 ./out/4000-5t.txt
+	 Average Execution Time: 06:27,438 +/- 00:02,413 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 6 Threads
+./bin/prog ./doc/inputs/4000.txt 6 10 ./out/4000-6t.txt
+	 Average Execution Time: 06:04,564 +/- 00:01,151 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 7 Threads
+./bin/prog ./doc/inputs/4000.txt 7 10 ./out/4000-7t.txt
+	 Average Execution Time: 05:44,277 +/- 00:01,775 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 8 Threads
+./bin/prog ./doc/inputs/4000.txt 8 10 ./out/4000-8t.txt
+	 Average Execution Time: 05:08,433 +/- 00:01,078 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 9 Threads
+./bin/prog ./doc/inputs/4000.txt 9 10 ./out/4000-9t.txt
+	 Average Execution Time: 05:39,728 +/- 00:03,570 
+-------------------------------------------------------------------------------
+Executing for 4000 Matix - 10 Threads
+./bin/prog ./doc/inputs/4000.txt 10 10 ./out/4000-10t.txt
+	 Average Execution Time: 05:43,126 +/- 00:00,747 
+-------------------------------------------------------------------------------
